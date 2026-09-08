@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Tomorrow Cut Optimizer
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+
+<body>
+
+<div class="app-container">
+
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header class="app-header">
+
+    <h1>
+      Tomorrow Cut Optimizer
+    </h1>
+
+    <p>
+      패널쏘 · 테이블쏘용 Guillotine Cutting Optimizer
+    </p>
+
+  </header>
+
+
+
+  <!-- =====================================================
+       1. 원장 설정
+  ====================================================== -->
+
+  <section class="card">
+
+    <div class="section-title">
+
+      <span class="step-number">
+        1
+      </span>
+
+      <div>
+
+        <h2>
+          원장 설정
+        </h2>
+
+        <p>
+          사용할 합판 또는 MDF 원장 규격을 입력하세요.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="input-grid">
+
+
+      <label class="input-box">
+
+        <span>
+          원장 가로
+        </span>
+
+        <div class="number-input">
+
+          <input
+            id="sheetWidth"
+            type="number"
+            value="1220"
+            min="1"
+          >
+
+          <span>
+            mm
+          </span>
+
+        </div>
+
+      </label>
+
+
+
+      <label class="input-box">
+
+        <span>
+          원장 세로
+        </span>
+
+        <div class="number-input">
+
+          <input
+            id="sheetHeight"
+            type="number"
+            value="2440"
+            min="1"
+          >
+
+          <span>
+            mm
+          </span>
+
+        </div>
+
+      </label>
+
+
+
+      <label class="input-box">
+
+        <span>
+          톱날 두께 (Kerf)
+        </span>
+
+        <div class="number-input">
+
+          <input
+            id="kerf"
+            type="number"
+            value="3"
+            min="0"
+            step="0.1"
+          >
+
+          <span>
+            mm
+          </span>
+
+        </div>
+
+      </label>
+
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       2. 가재단
+  ====================================================== -->
+
+  <section class="card">
+
+    <div class="section-title">
+
+      <span class="step-number">
+        2
+      </span>
+
+      <div>
+
+        <h2>
+          첫 스타트 가재단
+        </h2>
+
+        <p>
+          원장의 첫 기준면을 정리한 뒤 본 재단을 시작할 수 있습니다.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="trim-box">
+
+
+      <label class="switch-row">
+
+        <input
+          type="checkbox"
+          id="trimEnabled"
+          onchange="updateTrimUI()"
+        >
+
+        <span class="switch"></span>
+
+
+        <div>
+
+          <strong>
+            가재단 사용
+          </strong>
+
+          <small>
+            각 새 원장의 첫 시작면에 한 번 적용됩니다.
+          </small>
+
+        </div>
+
+      </label>
+
+
+
+      <div
+        id="trimSettings"
+        class="trim-settings disabled"
+      >
+
+
+        <label class="input-box">
+
+          <span>
+            가재단량
+          </span>
+
+          <div class="number-input">
+
+            <input
+              id="trimAmount"
+              type="number"
+              value="5"
+              min="0"
+              step="0.1"
+              oninput="updateTrimInfo()"
+            >
+
+            <span>
+              mm
+            </span>
+
+          </div>
+
+        </label>
+
+
+
+        <div class="trim-direction">
+
+          <strong>
+            기준면
+          </strong>
+
+
+          <label>
+
+            <input
+              type="radio"
+              name="trimDirection"
+              value="width"
+              checked
+              onchange="updateTrimInfo()"
+            >
+
+            가로 시작면
+
+          </label>
+
+
+          <label>
+
+            <input
+              type="radio"
+              name="trimDirection"
+              value="height"
+              onchange="updateTrimInfo()"
+            >
+
+            세로 시작면
+
+          </label>
+
+        </div>
+
+
+
+        <div
+          id="trimInfo"
+          class="info-box"
+        >
+
+          <strong>
+            가재단 미사용
+          </strong>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       3. 재단 방식
+  ====================================================== -->
+
+  <section class="card">
+
+    <div class="section-title">
+
+      <span class="step-number">
+        3
+      </span>
+
+      <div>
+
+        <h2>
+          재단 방식
+        </h2>
+
+        <p>
+          소재의 결방향을 고려할지 선택하세요.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="mode-grid">
+
+
+      <label class="mode-card">
+
+        <input
+          type="radio"
+          name="cutMode"
+          value="free"
+          checked
+          onchange="updateCutMode()"
+        >
+
+        <div>
+
+          <strong>
+            결방향 고려 안 함
+          </strong>
+
+          <p>
+            MDF · PB 등
+          </p>
+
+          <small>
+            부재별 90° 회전을 허용할 수 있습니다.
+          </small>
+
+        </div>
+
+      </label>
+
+
+
+      <label class="mode-card">
+
+        <input
+          type="radio"
+          name="cutMode"
+          value="grain"
+          onchange="updateCutMode()"
+        >
+
+        <div>
+
+          <strong>
+            결방향 고려
+          </strong>
+
+          <p>
+            합판 · 무늬목 등
+          </p>
+
+          <small>
+            회전 금지 · 원장 길이 방향 우선 재단
+          </small>
+
+        </div>
+
+      </label>
+
+
+    </div>
+
+
+    <div
+      id="modeNotice"
+      class="mode-notice"
+    >
+
+      결방향 고려 안 함 · 회전 허용 부재는 90° 배치 비교
+
+    </div>
+
+
+  </section>
+
+
+
+  <!-- =====================================================
+       4. 부재 입력
+  ====================================================== -->
+
+  <section class="card">
+
+
+    <div class="section-title section-title-between">
+
+
+      <div class="title-left">
+
+        <span class="step-number">
+          4
+        </span>
+
+        <div>
+
+          <h2>
+            부재 입력
+          </h2>
+
+          <p>
+            필요한 부재 규격과 수량을 입력하세요.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="secondary-button"
+        onclick="addPart()"
+      >
+
+        + 부재 추가
+
+      </button>
+
+
+    </div>
+
+
+
+    <div class="part-header">
+
+      <span>이름</span>
+      <span>가로</span>
+      <span>세로</span>
+      <span>수량</span>
+      <span>회전 허용</span>
+      <span></span>
+
+    </div>
+
+
+
+    <div id="partList">
+
+
+      <!-- A -->
+
+      <div class="part-row">
+
+        <input
+          class="part-name"
+          type="text"
+          value="A"
+        >
+
+        <div class="unit-input">
+
+          <input
+            class="part-width"
+            type="number"
+            value="400"
+            min="1"
+          >
+
+          <span>mm</span>
+
+        </div>
+
+
+        <div class="unit-input">
+
+          <input
+            class="part-height"
+            type="number"
+            value="900"
+            min="1"
+          >
+
+          <span>mm</span>
+
+        </div>
+
+
+        <input
+          class="part-qty"
+          type="number"
+          value="8"
+          min="1"
+        >
+
+
+        <label class="rotation-check">
+
+          <input
+            class="part-rotate"
+            type="checkbox"
+            checked
+          >
+
+          90° 가능
+
+        </label>
+
+
+        <button
+          type="button"
+          class="delete-button"
+          onclick="deletePart(this)"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+
+      <!-- B -->
+
+      <div class="part-row">
+
+        <input
+          class="part-name"
+          type="text"
+          value="B"
+        >
+
+        <div class="unit-input">
+
+          <input
+            class="part-width"
+            type="number"
+            value="900"
+            min="1"
+          >
+
+          <span>mm</span>
+
+        </div>
+
+
+        <div class="unit-input">
+
+          <input
+            class="part-height"
+            type="number"
+            value="785"
+            min="1"
+          >
+
+          <span>mm</span>
+
+        </div>
+
+
+        <input
+          class="part-qty"
+          type="number"
+          value="8"
+          min="1"
+        >
+
+
+        <label class="rotation-check">
+
+          <input
+            class="part-rotate"
+            type="checkbox"
+            checked
+          >
+
+          90° 가능
+
+        </label>
+
+
+        <button
+          type="button"
+          class="delete-button"
+          onclick="deletePart(this)"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+
+      <!-- C -->
+
+      <div class="part-row">
+
+        <input
+          class="part-name"
+          type="text"
+          value="C"
+        >
+
+        <div class="unit-input">
+
+          <input
+            class="part-width"
+            type="number"
+            value="370"
+            min="1"
+          >
+
+          <span>mm</span>
+
+        </div>
+
+
+        <div class="unit-input">
+
+          <input
+            class="part-height"
+            type="number"
+            value="785"
+            min="1"
+          >
+
+          <span>mm</span>
+
+        </div>
+
+
+        <input
+          class="part-qty"
+          type="number"
+          value="8"
+          min="1"
+        >
+
+
+        <label class="rotation-check">
+
+          <input
+            class="part-rotate"
+            type="checkbox"
+            checked
+          >
+
+          90° 가능
+
+        </label>
+
+
+        <button
+          type="button"
+          class="delete-button"
+          onclick="deletePart(this)"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+    </div>
+
+
+  </section>
+
+
+
+  <!-- =====================================================
+       버튼
+  ====================================================== -->
+
+  <div class="calculate-area">
+
+
+    <button
+      type="button"
+      class="calculate-button"
+      onclick="calculate()"
+    >
+
+      재단 최적화 계산
+
+    </button>
+
+
+    <button
+      type="button"
+      class="pdf-button"
+      onclick="exportPDF()"
+    >
+
+      배치도 PDF 출력
+
+    </button>
+
+
+  </div>
+
+
+
+  <!-- =====================================================
+       결과
+  ====================================================== -->
+
+  <section id="resultSection">
+
+
+    <div id="result"></div>
+
+    <div id="optimizationInfo"></div>
+
+
+
+    <section class="result-card cut-guide-card">
+
+
+      <div class="result-title">
+
+        <h2>
+          먼저 재단할 치수
+        </h2>
+
+        <p>
+          패널쏘에서 먼저 잡아야 할 1차 재단 치수입니다.
+        </p>
+
+      </div>
+
+
+      <div id="cutSequence">
+
+        아직 계산하지 않았습니다.
+
+      </div>
+
+
+    </section>
+
+
+
+    <section class="result-card layout-card">
+
+
+      <div class="result-title">
+
+        <h2>
+          원장 재단 배치도
+        </h2>
+
+        <p>
+          같은 규격의 부재는 같은 색상으로 표시됩니다.
+        </p>
+
+      </div>
+
+
+      <div id="layoutArea">
+
+        재단 최적화를 실행하면 배치도가 표시됩니다.
+
+      </div>
+
+
+    </section>
+
+
+  </section>
+
+
+</div>
+
+
+<script src="script.js"></script>
+
+
+</body>
+
+</html>
