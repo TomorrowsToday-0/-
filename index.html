@@ -10,9 +10,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>
-    Tomorrow Cut Optimizer
-  </title>
+  <title>Tomorrow Cut Optimizer</title>
 
   <link
     rel="stylesheet"
@@ -27,9 +25,9 @@
 <div class="app-container">
 
 
-  <!-- =====================================================
+  <!-- ================================
        HEADER
-  ====================================================== -->
+  ================================= -->
 
   <header class="app-header">
 
@@ -38,16 +36,16 @@
     </h1>
 
     <p>
-      패널쏘 · 테이블쏘용 Guillotine Cutting Optimizer
+      패널쏘 · 테이블쏘용 목재 재단 최적화
     </p>
 
   </header>
 
 
 
-  <!-- =====================================================
+  <!-- ================================
        1. 원장 설정
-  ====================================================== -->
+  ================================= -->
 
   <section class="card">
 
@@ -64,7 +62,7 @@
         </h2>
 
         <p>
-          사용할 합판 또는 MDF 원장 규격을 입력하세요.
+          사용할 원장의 규격과 톱날 두께를 입력하세요.
         </p>
 
       </div>
@@ -99,7 +97,6 @@
       </label>
 
 
-
       <label class="input-box">
 
         <span>
@@ -124,11 +121,10 @@
       </label>
 
 
-
       <label class="input-box">
 
         <span>
-          톱날 두께 (Kerf)
+          톱날 두께
         </span>
 
         <div class="number-input">
@@ -156,9 +152,9 @@
 
 
 
-  <!-- =====================================================
-       2. 가재단
-  ====================================================== -->
+  <!-- ================================
+       2. 첫 가재단
+  ================================= -->
 
   <section class="card">
 
@@ -175,7 +171,7 @@
         </h2>
 
         <p>
-          원장의 첫 기준면을 정리한 뒤 본 재단을 시작할 수 있습니다.
+          원장의 첫 기준면을 정리한 뒤 본 재단을 시작합니다.
         </p>
 
       </div>
@@ -245,11 +241,10 @@
         </label>
 
 
-
         <div class="trim-direction">
 
           <strong>
-            기준면
+            가재단 기준면
           </strong>
 
 
@@ -284,7 +279,6 @@
         </div>
 
 
-
         <div
           id="trimInfo"
           class="info-box"
@@ -299,16 +293,15 @@
 
       </div>
 
-
     </div>
 
   </section>
 
 
 
-  <!-- =====================================================
+  <!-- ================================
        3. 재단 방식
-  ====================================================== -->
+  ================================= -->
 
   <section class="card">
 
@@ -365,7 +358,6 @@
       </label>
 
 
-
       <label class="mode-card">
 
         <input
@@ -402,7 +394,7 @@
       class="mode-notice"
     >
 
-      결방향 고려 안 함 · 회전 허용 부재는 90° 배치 비교
+      결방향 고려 안 함 · 회전 허용 부재는 90° 배치까지 비교
 
     </div>
 
@@ -411,9 +403,9 @@
 
 
 
-  <!-- =====================================================
+  <!-- ================================
        4. 부재 입력
-  ====================================================== -->
+  ================================= -->
 
   <section class="card">
 
@@ -447,33 +439,32 @@
         class="secondary-button"
         onclick="addPart()"
       >
-
         + 부재 추가
-
       </button>
 
 
     </div>
 
 
-
     <div class="part-header">
 
       <span>이름</span>
+
       <span>가로</span>
+
       <span>세로</span>
+
       <span>수량</span>
+
       <span>회전 허용</span>
+
       <span></span>
 
     </div>
 
 
-
     <div id="partList">
 
-
-      <!-- A -->
 
       <div class="part-row">
 
@@ -496,7 +487,6 @@
 
         </div>
 
-
         <div class="unit-input">
 
           <input
@@ -510,14 +500,12 @@
 
         </div>
 
-
         <input
           class="part-qty"
           type="number"
           value="8"
           min="1"
         >
-
 
         <label class="rotation-check">
 
@@ -531,7 +519,6 @@
 
         </label>
 
-
         <button
           type="button"
           class="delete-button"
@@ -543,8 +530,6 @@
       </div>
 
 
-
-      <!-- B -->
 
       <div class="part-row">
 
@@ -567,7 +552,6 @@
 
         </div>
 
-
         <div class="unit-input">
 
           <input
@@ -581,14 +565,12 @@
 
         </div>
 
-
         <input
           class="part-qty"
           type="number"
           value="8"
           min="1"
         >
-
 
         <label class="rotation-check">
 
@@ -602,7 +584,6 @@
 
         </label>
 
-
         <button
           type="button"
           class="delete-button"
@@ -614,8 +595,6 @@
       </div>
 
 
-
-      <!-- C -->
 
       <div class="part-row">
 
@@ -638,7 +617,6 @@
 
         </div>
 
-
         <div class="unit-input">
 
           <input
@@ -652,14 +630,12 @@
 
         </div>
 
-
         <input
           class="part-qty"
           type="number"
           value="8"
           min="1"
         >
-
 
         <label class="rotation-check">
 
@@ -672,7 +648,6 @@
           90° 가능
 
         </label>
-
 
         <button
           type="button"
@@ -692,21 +667,18 @@
 
 
 
-  <!-- =====================================================
-       버튼
-  ====================================================== -->
+  <!-- ================================
+       실행
+  ================================= -->
 
   <div class="calculate-area">
-
 
     <button
       type="button"
       class="calculate-button"
       onclick="calculate()"
     >
-
       재단 최적화 계산
-
     </button>
 
 
@@ -715,24 +687,22 @@
       class="pdf-button"
       onclick="exportPDF()"
     >
-
       배치도 PDF 출력
-
     </button>
-
 
   </div>
 
 
 
-  <!-- =====================================================
+  <!-- ================================
        결과
-  ====================================================== -->
+  ================================= -->
 
   <section id="resultSection">
 
 
     <div id="result"></div>
+
 
     <div id="optimizationInfo"></div>
 
@@ -748,7 +718,7 @@
         </h2>
 
         <p>
-          패널쏘에서 먼저 잡아야 할 1차 재단 치수입니다.
+          패널쏘에서 먼저 잡아야 할 재단 치수를 표시합니다.
         </p>
 
       </div>
@@ -798,7 +768,6 @@
 
 
 <script src="script.js"></script>
-
 
 </body>
 

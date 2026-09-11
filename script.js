@@ -4,7 +4,18 @@
 
 
 /* =========================================================
-   부재 색상
+   마지막 계산 결과 저장
+
+   모바일에서도 PDF를 누르면
+   PDF용 큰 사이즈로 다시 그리기 위해 사용
+========================================================= */
+
+let lastBestResult = null;
+let lastSheetSettings = null;
+
+
+/* =========================================================
+   규격별 색상
 ========================================================= */
 
 const PART_COLORS = [
@@ -40,15 +51,13 @@ function resetPartColors() {
 }
 
 
-function getPartSizeKey(
-  part
-) {
+function getPartSizeKey(part) {
 
   /*
-     원래 규격 기준.
+     400 × 900
+     900 × 400
 
-     400×900 / 900×400을
-     같은 사각형 규격으로 취급.
+     같은 규격으로 판단
   */
 
   const small =
@@ -72,12 +81,12 @@ function getPartSizeKey(
 }
 
 
-function getPartColor(
-  part
-) {
+function getPartColor(part) {
 
   const key =
-    getPartSizeKey(part);
+    getPartSizeKey(
+      part
+    );
 
 
   if (
@@ -177,7 +186,8 @@ function updateCutMode() {
 
 
     notice.innerHTML =
-      "결방향 고려 · 부재 90° 회전 금지 · 원장 길이 방향을 유지한 스트립부터 재단";
+
+      "결방향 고려 · 부재 회전 금지 · 원장 길이 방향을 유지한 스트립부터 재단";
 
   }
 
@@ -194,6 +204,7 @@ function updateCutMode() {
 
 
     notice.innerHTML =
+
       "결방향 고려 안 함 · 회전 허용 부재는 90° 배치까지 비교";
 
   }
@@ -276,10 +287,6 @@ function updateTrimInfo() {
     0;
 
 
-  const direction =
-    getTrimDirection();
-
-
   const offset =
     trim
     +
@@ -294,7 +301,7 @@ function updateTrimInfo() {
 
     +
 
-    톱날
+    톱날 두께
 
     ${formatNumber(kerf)}mm
 
@@ -308,18 +315,6 @@ function updateTrimInfo() {
 
     </strong>
 
-    <br>
-
-    적용 기준면 :
-
-    ${
-      direction === "width"
-      ?
-      "가로 시작면"
-      :
-      "세로 시작면"
-    }
-
   `;
 
 }
@@ -327,7 +322,7 @@ function updateTrimInfo() {
 
 
 /* =========================================================
-   부재 추가 / 삭제
+   부재 추가
 ========================================================= */
 
 function addPart() {
@@ -447,9 +442,12 @@ function addPart() {
 }
 
 
-function deletePart(
-  button
-) {
+
+/* =========================================================
+   부재 삭제
+========================================================= */
+
+function deletePart(button) {
 
   const rows =
     document.querySelectorAll(
@@ -563,7 +561,9 @@ function getSheetSettings() {
   ) {
 
     if (
-      trimDirection === "width"
+      trimDirection
+      ===
+      "width"
     ) {
 
       startX =
@@ -753,7 +753,7 @@ function readParts() {
 
 
 /* =========================================================
-   부재 방향
+   방향 선택
 ========================================================= */
 
 function chooseOrientation(
@@ -876,7 +876,9 @@ function chooseOrientation(
   ) {
 
     if (
-      direction === "horizontal"
+      direction
+      ===
+      "horizontal"
     ) {
 
       return valid
@@ -914,7 +916,9 @@ function chooseOrientation(
   ) {
 
     if (
-      direction === "horizontal"
+      direction
+      ===
+      "horizontal"
     ) {
 
       return valid
@@ -1035,10 +1039,16 @@ function createStrips(
 
 
       const thickness =
-        direction === "horizontal"
+        direction
+        ===
+        "horizontal"
+
         ?
+
         part.height
+
         :
+
         part.width;
 
 
@@ -1080,10 +1090,16 @@ function createStrips(
 
 
       const capacity =
-        direction === "horizontal"
+        direction
+        ===
+        "horizontal"
+
         ?
+
         settings.usableWidth
+
         :
+
         settings.usableHeight;
 
 
@@ -1095,27 +1111,43 @@ function createStrips(
 
 
           const lengthA =
-            direction === "horizontal"
+            direction
+            ===
+            "horizontal"
+
             ?
+
             a.width
+
             :
+
             a.height;
 
 
           const lengthB =
-            direction === "horizontal"
+            direction
+            ===
+            "horizontal"
+
             ?
+
             b.width
+
             :
+
             b.height;
 
 
           return (
             ascending
             ?
-            lengthA - lengthB
+            lengthA
+            -
+            lengthB
             :
-            lengthB - lengthA
+            lengthB
+            -
+            lengthA
           );
 
         }
@@ -1127,10 +1159,16 @@ function createStrips(
 
 
           const length =
-            direction === "horizontal"
+            direction
+            ===
+            "horizontal"
+
             ?
+
             part.width
+
             :
+
             part.height;
 
 
@@ -1268,7 +1306,7 @@ function createStrips(
 
 
 /* =========================================================
-   스트립을 원장에 배치
+   원장에 스트립 배치
 ========================================================= */
 
 function packSheets(
@@ -1278,10 +1316,16 @@ function packSheets(
 ) {
 
   const capacity =
-    direction === "horizontal"
+    direction
+    ===
+    "horizontal"
+
     ?
+
     settings.usableHeight
+
     :
+
     settings.usableWidth;
 
 
@@ -1977,10 +2021,15 @@ function makeCandidate(
 
   const oriented =
     orientParts(
+
       parts,
+
       direction,
+
       strategy,
+
       settings
+
     );
 
 
@@ -1995,18 +2044,27 @@ function makeCandidate(
 
   const strips =
     createStrips(
+
       oriented,
+
       direction,
+
       settings,
+
       ascending
+
     );
 
 
   const sheets =
     packSheets(
+
       strips,
+
       direction,
+
       settings
+
     );
 
 
@@ -2015,7 +2073,9 @@ function makeCandidate(
 
 
       if (
-        direction === "horizontal"
+        direction
+        ===
+        "horizontal"
       ) {
 
         layoutHorizontal(
@@ -2144,7 +2204,7 @@ function compareCandidates(
 
 
 /* =========================================================
-   동일 패턴
+   동일 원장 패턴
 ========================================================= */
 
 function makeSheetPatternKey(
@@ -2265,7 +2325,6 @@ function groupSameSheets(
         map.has(key)
       ) {
 
-
         const group =
           map.get(key);
 
@@ -2281,7 +2340,6 @@ function groupSameSheets(
       }
 
       else {
-
 
         const group = {
 
@@ -2510,7 +2568,9 @@ function calculate() {
 
 
   if (
-    mode === "grain"
+    mode
+    ===
+    "grain"
   ) {
 
     directions = [
@@ -2630,6 +2690,18 @@ function calculate() {
     );
 
 
+  /*
+     마지막 결과 저장
+  */
+
+  lastBestResult =
+    best;
+
+
+  lastSheetSettings =
+    settings;
+
+
   showResult(
 
     best,
@@ -2638,9 +2710,7 @@ function calculate() {
 
     settings,
 
-    mode,
-
-    candidates.length
+    mode
 
   );
 
@@ -2653,7 +2723,8 @@ function calculate() {
 
   drawSheets(
     best,
-    settings
+    settings,
+    false
   );
 
 }
@@ -2661,22 +2732,29 @@ function calculate() {
 
 
 /* =========================================================
-   결과
+   계산 결과
+
+   비교 후보 삭제
 ========================================================= */
 
 function showResult(
   best,
   parts,
   settings,
-  mode,
-  candidateCount
+  mode
 ) {
 
   const directionText =
-    best.direction === "vertical"
+    best.direction
+    ===
+    "vertical"
+
     ?
+
     "길이 방향 우선"
+
     :
+
     "폭 방향 우선";
 
 
@@ -2696,55 +2774,118 @@ function showResult(
         계산 결과
       </h2>
 
+
       <div class="summary-grid">
 
-        <div class="summary-item">
-          <span>필요 원장</span>
-          <strong>${best.sheets.length}장</strong>
-        </div>
 
         <div class="summary-item">
-          <span>서로 다른 배치</span>
-          <strong>${best.patternGroups.length}개</strong>
-        </div>
 
-        <div class="summary-item">
-          <span>중복 원장</span>
-          <strong>${duplicateSheets}장</strong>
-        </div>
+          <span>
+            필요 원장
+          </span>
 
-        <div class="summary-item">
-          <span>총 부재</span>
-          <strong>${parts.length}개</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>1차 재단</span>
-          <strong>${directionText}</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>Kerf</span>
-          <strong>${formatNumber(settings.kerf)}mm</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>재단 모드</span>
           <strong>
+            ${best.sheets.length}장
+          </strong>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <span>
+            서로 다른 배치
+          </span>
+
+          <strong>
+            ${best.patternGroups.length}개
+          </strong>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <span>
+            중복 원장
+          </span>
+
+          <strong>
+            ${duplicateSheets}장
+          </strong>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <span>
+            총 부재
+          </span>
+
+          <strong>
+            ${parts.length}개
+          </strong>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <span>
+            1차 재단
+          </span>
+
+          <strong>
+            ${directionText}
+          </strong>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <span>
+            톱날 두께
+          </span>
+
+          <strong>
+
+            ${formatNumber(
+              settings.kerf
+            )}mm
+
+          </strong>
+
+        </div>
+
+
+        <div class="summary-item">
+
+          <span>
+            재단 모드
+          </span>
+
+          <strong>
+
             ${
-              mode === "grain"
+              mode
+              ===
+              "grain"
+
               ?
+
               "결방향 고려"
+
               :
+
               "결방향 자유"
             }
+
           </strong>
+
         </div>
 
-        <div class="summary-item">
-          <span>비교 후보</span>
-          <strong>${candidateCount}개</strong>
-        </div>
 
       </div>
 
@@ -2774,8 +2915,15 @@ function showResult(
         동일 배치 자동 묶기
       </strong>
 
-      <div style="margin-top:10px;">
+      <div
+        style="
+          margin-top:10px;
+          line-height:1.8;
+        "
+      >
+
         ${patterns}
+
       </div>
 
     </div>
@@ -2826,8 +2974,11 @@ function drawCutGuide(
       let html = `
 
         <h3>
+
           패턴 ${group.patternName}
+
           × ${group.count}장
+
         </h3>
 
       `;
@@ -2847,13 +2998,15 @@ function drawCutGuide(
 
             <div class="cut-line">
 
+              가재단
+
               ${formatNumber(
                 settings.trimAmount
               )}mm
 
               +
 
-              Kerf
+              톱날 두께
 
               ${formatNumber(
                 settings.kerf
@@ -2861,12 +3014,14 @@ function drawCutGuide(
 
               =
 
-              시작점
+              시작 오프셋
 
               <b>
+
                 ${formatNumber(
                   settings.trimOffset
                 )}mm
+
               </b>
 
             </div>
@@ -2879,7 +3034,9 @@ function drawCutGuide(
 
 
       if (
-        best.direction === "vertical"
+        best.direction
+        ===
+        "vertical"
       ) {
 
         html += `
@@ -2895,6 +3052,7 @@ function drawCutGuide(
               ${formatNumber(
                 settings.usableHeight
               )}mm 길이를 유지한 상태에서
+
               폭을 먼저 재단
 
             </div>
@@ -2925,9 +3083,11 @@ function drawCutGuide(
                 ${index + 1}번째 :
 
                 <b>
+
                   ${formatNumber(
                     strip.width
                   )}mm
+
                 </b>
 
                 ${
@@ -2936,11 +3096,15 @@ function drawCutGuide(
                   sheet.strips.length
                   -
                   1
+
                   ?
-                  ` → Kerf ${formatNumber(
+
+                  ` → 톱날 ${formatNumber(
                     settings.kerf
                   )}mm`
+
                   :
+
                   ""
                 }
 
@@ -2953,7 +3117,9 @@ function drawCutGuide(
 
 
         html += `
+
           </div>
+
         `;
 
 
@@ -2969,8 +3135,12 @@ function drawCutGuide(
               <div class="cut-group">
 
                 <strong>
-                  스트립 ${stripIndex + 1}
+
+                  스트립
+                  ${stripIndex + 1}
+
                   다음 재단
+
                 </strong>
 
             `;
@@ -2994,9 +3164,11 @@ function drawCutGuide(
                     →
 
                     <b>
+
                       ${formatNumber(
                         part.height
                       )}mm
+
                     </b>
 
                   </div>
@@ -3008,7 +3180,9 @@ function drawCutGuide(
 
 
             html += `
+
               </div>
+
             `;
 
           }
@@ -3058,9 +3232,11 @@ function drawCutGuide(
                 ${index + 1}번째 :
 
                 <b>
+
                   ${formatNumber(
                     strip.height
                   )}mm
+
                 </b>
 
                 ${
@@ -3069,11 +3245,15 @@ function drawCutGuide(
                   sheet.strips.length
                   -
                   1
+
                   ?
-                  ` → Kerf ${formatNumber(
+
+                  ` → 톱날 ${formatNumber(
                     settings.kerf
                   )}mm`
+
                   :
+
                   ""
                 }
 
@@ -3086,7 +3266,9 @@ function drawCutGuide(
 
 
         html += `
+
           </div>
+
         `;
 
 
@@ -3102,8 +3284,12 @@ function drawCutGuide(
               <div class="cut-group">
 
                 <strong>
-                  스트립 ${stripIndex + 1}
+
+                  스트립
+                  ${stripIndex + 1}
+
                   다음 재단
+
                 </strong>
 
             `;
@@ -3127,9 +3313,11 @@ function drawCutGuide(
                     →
 
                     <b>
+
                       ${formatNumber(
                         part.width
                       )}mm
+
                     </b>
 
                   </div>
@@ -3141,7 +3329,9 @@ function drawCutGuide(
 
 
             html += `
+
               </div>
+
             `;
 
           }
@@ -3167,7 +3357,9 @@ function drawCutGuide(
               이 방식으로
 
               <b>
+
                 총 ${group.count}장
+
               </b>
 
               동일하게 재단
@@ -3197,7 +3389,7 @@ function drawCutGuide(
 
 
 /* =========================================================
-   화면 좌표
+   실제 좌표 → 화면 좌표
 ========================================================= */
 
 function realRectToDisplay(
@@ -3314,7 +3506,7 @@ function drawRectangle(
 
 
 /* =========================================================
-   Kerf
+   톱날 두께 표시
 ========================================================= */
 
 function drawKerf(
@@ -3325,7 +3517,9 @@ function drawKerf(
 ) {
 
   const rect =
-    cut.direction === "vertical"
+    cut.direction
+    ===
+    "vertical"
 
     ?
 
@@ -3413,7 +3607,7 @@ function drawKerf(
 
 
 /* =========================================================
-   가재단
+   가재단 표시
 ========================================================= */
 
 function drawTrim(
@@ -3432,7 +3626,9 @@ function drawTrim(
 
 
   if (
-    settings.trimDirection === "width"
+    settings.trimDirection
+    ===
+    "width"
   ) {
 
     drawRectangle(
@@ -3441,9 +3637,11 @@ function drawTrim(
 
       {
 
-        x: 0,
+        x:
+          0,
 
-        y: 0,
+        y:
+          0,
 
         width:
           settings.trimAmount,
@@ -3476,7 +3674,8 @@ function drawTrim(
         x:
           settings.trimAmount,
 
-        y: 0,
+        y:
+          0,
 
         length:
           settings.sheetHeight,
@@ -3502,9 +3701,11 @@ function drawTrim(
 
       {
 
-        x: 0,
+        x:
+          0,
 
-        y: 0,
+        y:
+          0,
 
         width:
           settings.sheetWidth,
@@ -3534,7 +3735,8 @@ function drawTrim(
         direction:
           "horizontal",
 
-        x: 0,
+        x:
+          0,
 
         y:
           settings.trimAmount,
@@ -3560,12 +3762,10 @@ function drawTrim(
 
 
 /* =========================================================
-   범례 데이터
+   범례
 ========================================================= */
 
-function getLegendItems(
-  sheet
-) {
+function getLegendItems(sheet) {
 
   const map =
     new Map();
@@ -3588,8 +3788,6 @@ function getLegendItems(
         map.set(
           key,
           {
-
-            key,
 
             width:
               part.originalWidth,
@@ -3629,11 +3827,6 @@ function getLegendItems(
 }
 
 
-
-/* =========================================================
-   범례 표시
-========================================================= */
-
 function drawLegend(
   wrap,
   sheet
@@ -3643,15 +3836,6 @@ function drawLegend(
     getLegendItems(
       sheet
     );
-
-
-  if (
-    !items.length
-  ) {
-
-    return;
-
-  }
 
 
   const legend =
@@ -3743,11 +3927,18 @@ function drawLegend(
 
 /* =========================================================
    배치도
+
+   forPrint = false
+   → 화면용
+
+   forPrint = true
+   → PDF용 1000px
 ========================================================= */
 
 function drawSheets(
   best,
-  settings
+  settings,
+  forPrint = false
 ) {
 
   const target =
@@ -3760,16 +3951,70 @@ function drawSheets(
     "";
 
 
-  /*
-     2440 길이 원장을
-     약 1000px 폭으로 표시.
+  let maxWidth;
 
-     A4 landscape printable 폭과
-     거의 비슷해서 PDF에서도 크게 표시됨.
+
+  /*
+     PDF
   */
 
-  const maxWidth =
-    1000;
+  if (
+    forPrint
+  ) {
+
+    maxWidth =
+      1000;
+
+  }
+
+
+  /*
+     모바일
+  */
+
+  else if (
+    window.innerWidth
+    <=
+    650
+  ) {
+
+    const layoutCard =
+      document.querySelector(
+        ".layout-card"
+      );
+
+
+    const availableWidth =
+      layoutCard
+      ?
+      layoutCard.clientWidth
+      -
+      22
+      :
+      window.innerWidth
+      -
+      36;
+
+
+    maxWidth =
+      Math.max(
+        250,
+        availableWidth
+      );
+
+  }
+
+
+  /*
+     PC
+  */
+
+  else {
+
+    maxWidth =
+      1000;
+
+  }
 
 
   const scale =
@@ -3851,7 +4096,7 @@ function drawSheets(
 
 
       /*
-         자동 범례
+         색상 범례
       */
 
       drawLegend(
@@ -3883,9 +4128,13 @@ function drawSheets(
       */
 
       drawTrim(
+
         sheetEl,
+
         settings,
+
         scale
+
       );
 
 
@@ -3922,7 +4171,7 @@ function drawSheets(
 
 
       /*
-         Kerf
+         톱날 두께
       */
 
       sheet.cuts.forEach(
@@ -3977,11 +4226,7 @@ function drawSheets(
 
               ?
 
-              `<br>배치 ${formatNumber(
-                part.width
-              )} × ${formatNumber(
-                part.height
-              )} ↻`
+              `<br>↻`
 
               :
 
@@ -4015,10 +4260,6 @@ function drawSheets(
 
               scale,
 
-              part.rotated
-              ?
-              "part rotated"
-              :
               "part",
 
               text
@@ -4086,11 +4327,11 @@ function drawSheets(
 
 
           label.style.left =
-            `${d.left + 4}px`;
+            `${d.left + 3}px`;
 
 
           label.style.top =
-            `${d.top + 4}px`;
+            `${d.top + 3}px`;
 
 
           label.textContent =
@@ -4120,14 +4361,10 @@ function drawSheets(
         동일 배치 :
 
         <strong>
+
           ${group.count}장
+
         </strong>
-
-        &nbsp;·&nbsp;
-
-        원장 번호 :
-
-        ${group.sheetIndexes.join(", ")}
 
         &nbsp;·&nbsp;
 
@@ -4166,23 +4403,18 @@ function drawSheets(
 
 
 /* =========================================================
-   PDF
+   PDF 출력
+
+   모바일에서도
+   PDF 출력 직전 1000px로 다시 그림
 ========================================================= */
 
 function exportPDF() {
 
-  const layout =
-    document.getElementById(
-      "layoutArea"
-    );
-
-
   if (
-    !layout
+    !lastBestResult
     ||
-    !layout.querySelector(
-      ".sheet-wrap"
-    )
+    !lastSheetSettings
   ) {
 
     alert(
@@ -4194,9 +4426,118 @@ function exportPDF() {
   }
 
 
-  window.print();
+  /*
+     PDF용 큰 배치도로 다시 그림
+  */
+
+  drawSheets(
+
+    lastBestResult,
+
+    lastSheetSettings,
+
+    true
+
+  );
+
+
+  /*
+     브라우저가 다시 그린 후
+     인쇄창 실행
+  */
+
+  setTimeout(
+    () => {
+
+      window.print();
+
+    },
+    100
+  );
 
 }
+
+
+
+/* =========================================================
+   PDF 종료 후
+   현재 화면 크기에 맞게 다시 그림
+========================================================= */
+
+window.addEventListener(
+  "afterprint",
+  () => {
+
+
+    if (
+      lastBestResult
+      &&
+      lastSheetSettings
+    ) {
+
+      drawSheets(
+
+        lastBestResult,
+
+        lastSheetSettings,
+
+        false
+
+      );
+
+    }
+
+  }
+);
+
+
+
+/* =========================================================
+   화면 크기 변경
+========================================================= */
+
+let resizeTimer = null;
+
+
+window.addEventListener(
+  "resize",
+  () => {
+
+
+    clearTimeout(
+      resizeTimer
+    );
+
+
+    resizeTimer =
+      setTimeout(
+        () => {
+
+
+          if (
+            lastBestResult
+            &&
+            lastSheetSettings
+          ) {
+
+            drawSheets(
+
+              lastBestResult,
+
+              lastSheetSettings,
+
+              false
+
+            );
+
+          }
+
+        },
+        150
+      );
+
+  }
+);
 
 
 
@@ -4204,9 +4545,7 @@ function exportPDF() {
    기타
 ========================================================= */
 
-function formatNumber(
-  value
-) {
+function formatNumber(value) {
 
   if (
     Math.abs(
@@ -4235,9 +4574,7 @@ function formatNumber(
 }
 
 
-function roundKey(
-  value
-) {
+function roundKey(value) {
 
   return (
     Math.round(
@@ -4252,16 +4589,16 @@ function roundKey(
 }
 
 
-function showError(
-  message
-) {
+function showError(message) {
 
   document.getElementById(
     "result"
   ).innerHTML = `
 
     <div class="error-box">
+
       ${message}
+
     </div>
 
   `;
@@ -4277,6 +4614,14 @@ function showError(
     "layoutArea"
   ).innerHTML =
     "계산할 수 없습니다.";
+
+
+  lastBestResult =
+    null;
+
+
+  lastSheetSettings =
+    null;
 
 }
 
@@ -4316,8 +4661,9 @@ document
   );
 
 
+
 /* =========================================================
-   최초 실행
+   시작
 ========================================================= */
 
 updateCutMode();
